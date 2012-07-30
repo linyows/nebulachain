@@ -13,9 +13,27 @@ Gem::Specification.new do |s|
   s.description = %q{ Gem to add basic 'relationships' features if you're using rails3 with mongoid }
 
   s.rubyforge_project = 'chain'
+  s.files = [
+    'Gemfile',
+    'LICENSE.txt',
+    'Rakefile',
+    'chain.gemspec',
+    'lib/chain.rb',
+    'lib/chain/blockee.rb',
+    'lib/chain/blocker.rb',
+    'lib/chain/followee.rb',
+    'lib/chain/follower.rb',
+    'lib/chain/gave_dislike.rb',
+    'lib/chain/gave_like.rb',
+    'lib/chain/got_dislike.rb',
+    'lib/chain/got_like.rb',
+    'lib/chain/helper.rb',
+    'lib/chain/version.rb',
+    'app/models/relationship.rb',
+    'spec/spec_helper.rb'
+  ]
 
   s.add_dependency 'mongoid'
-  s.add_dependency 'bson_ext'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'rspec'
 
