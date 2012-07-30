@@ -7,8 +7,8 @@ module Chain
       base.has_many :blockers, class_name: 'Relationship', as: :blocker, dependent: :destroy
     end
 
-    def blocker?(model)
-      0 < self.blockers.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def blocked_by?(model)
+      0 < self.blockers.where(target_id: model.id).count
     end
 
     def blockers_count

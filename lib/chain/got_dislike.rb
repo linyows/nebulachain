@@ -7,8 +7,8 @@ module Chain
       base.has_many :got_dislikes, class_name: 'Relationship', as: :got_dislike, dependent: :destroy
     end
 
-    def got_dislike?(model)
-      0 < self.got_dislikes.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def disliked_by?(model)
+      0 < self.got_dislikes.where(target_id: model.id).count
     end
 
     def all_got_dislikes

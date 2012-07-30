@@ -9,7 +9,7 @@ module Chain
 
     def toggle_like(model)
       # unlike
-      if self.gave_likes?(model)
+      if self.like?(model)
         self.unlike!(model)
       # like
       else
@@ -19,7 +19,7 @@ module Chain
     end
 
     def like(model)
-      if !self.gave_likes?(model)
+      if !self.like?(model)
         self.undislike(model)
         self.like!(model)
       else
@@ -39,7 +39,7 @@ module Chain
     end
 
     def unlike(model)
-      self.gave_likes?(model) ? self.unlike!(model) : false
+      self.like?(model) ? self.unlike!(model) : false
     end
 
     def unlike!(model)
@@ -53,8 +53,8 @@ module Chain
       self.after_unlike(model) if self.respond_to?('after_unlike')
     end
 
-    def gave_likes?(model)
-      0 < self.gave_likes.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def like?(model)
+      0 < self.gave_likes.where(target_id: model.id).count
     end
 
     def all_gave_likes

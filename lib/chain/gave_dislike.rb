@@ -9,7 +9,7 @@ module Chain
 
     def toggle_dislike(model)
       # undislike
-      if self.gave_dislikes?(model)
+      if self.dislike?(model)
         self.undislike!(model)
       # dislike
       else
@@ -19,7 +19,7 @@ module Chain
     end
 
     def dislike(model)
-      if !self.gave_dislikes?(model)
+      if !self.dislike?(model)
         self.unlikes(model)
         self.dislike!(model)
       else
@@ -39,7 +39,7 @@ module Chain
     end
 
     def undislike(model)
-      if self.gave_dislikes?(model)
+      if self.dislike?(model)
         self.undislike!(model)
       else
         false
@@ -57,8 +57,8 @@ module Chain
       self.after_undislike(model) if self.respond_to?('after_undislike')
     end
 
-    def gave_dislikes?(model)
-      0 < self.gave_dislikes.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def dislike?(model)
+      0 < self.gave_dislikes.where(target_id: model.id).count
     end
 
     def all_gave_dislikes

@@ -7,8 +7,8 @@ module Chain
       base.has_many :followers, class_name: 'Relationship', as: :follower, dependent: :destroy
     end
 
-    def follower?(model)
-      0 < self.followers.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def followed_by?(model)
+      0 < self.followers.where(target_id: model.id).count
     end
 
     def all_followers

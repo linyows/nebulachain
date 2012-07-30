@@ -8,7 +8,7 @@ module Chain
     end
 
     def block(model)
-      if self.id != model.id && !self.blockees?(model)
+      if self.id != model.id && !self.blocking?(model)
         model.before_blocked_by(self) if model.respond_to?('before_blocked_by')
         model.unfollow(self) if self.followers?(model)
         model.blockers.create!(target_type: self.class.name, target_id: self.id)
@@ -25,7 +25,7 @@ module Chain
     end
 
     def unblock(model)
-      if self.id != model.id && self.blockees?(model)
+      if self.id != model.id && self.blocking?(model)
         model.before_unblocked_by(self) if model.respond_to?('before_unblocked_by')
         model.blockers.where(target_type: self.class.name, target_id: self.id).destroy
         model.inc(:blockers_count, -1)
@@ -40,8 +40,8 @@ module Chain
       end
     end
 
-    def blockees?(model)
-      0 < self.blockees.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def blocking?(model)
+      0 < self.blockees.where(target_id: model.id).count
     end
 
     def blockees_count

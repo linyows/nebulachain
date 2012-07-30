@@ -7,8 +7,8 @@ module Chain
       base.has_many :got_likes, class_name: 'Relationship', as: :got_like, dependent: :destroy
     end
 
-    def got_like?(model)
-      0 < self.got_likes.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def liked_by?(model)
+      0 < self.got_likes.where(target_id: model.id).count
     end
 
     def all_got_likes

@@ -10,7 +10,7 @@ module Chain
     def toggle_follow(model)
       return false if self.id == model.id
       # unfollow
-      if self.followees?(model)
+      if self.following?(model)
         self.unfollow!(model)
       # follow
       else
@@ -20,7 +20,7 @@ module Chain
     end
 
     def follow(model)
-      if self.id != model.id && !self.followees?(model)
+      if self.id != model.id && !self.following?(model)
         return false if self.blocker?(model)
         self.follow!(model)
       else
@@ -40,7 +40,7 @@ module Chain
     end
 
     def unfollow(model)
-      if self.id != model.id && self.followees?(model)
+      if self.id != model.id && self.following?(model)
         self.unfollow!(model)
       else
         false
@@ -58,8 +58,8 @@ module Chain
       self.after_unfollow(model) if self.respond_to?('after_unfollow')
     end
 
-    def followees?(model)
-      0 < self.followees.find(:all, conditions: {target_id: model.id}).limit(1).count
+    def following?(model)
+      0 < self.followees.where(target_id: model.id).count
     end
 
     def followees_count_by_model(model)
