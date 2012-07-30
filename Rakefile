@@ -1,2 +1,2 @@
-require 'bundler'
-Bundler::GemHelper.install_tasks
+#!/usr/bin/env rake
+require "bundler/gem_tasks"

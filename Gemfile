@@ -1,3 +1,7 @@
 source "http://rubygems.org"
 
-gemspec
+gem 'mongoid'
+group :development, :test do
+  gem 'rspec'
+  gem 'database_cleaner'
+end
