@@ -4,9 +4,9 @@ require File.expand_path('../lib/chain/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["linyows"]
   gem.email         = ["linyows@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage    = 'https://github.com/linyows/chain'
+  gem.description   = %q{ Gem to add basic 'relationships' features if you're using rails3 with mongoid3 }
+  gem.summary       = %q{ Add basic 'relationships' features to rails3 + mongoid3 }
+  gem.homepage      = 'https://github.com/linyows/chain'
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
