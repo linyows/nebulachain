@@ -5,8 +5,6 @@ module Chain
     included do |base|
       base.field    :got_likes_count, type: Integer, default: 0
       base.has_many :got_likes, class_name: 'Relationship', as: :got_like, dependent: :destroy
-      base.alias_attribute :liking_id, :gave_like_id
-      base.alias_attribute :liking_type, :gave_like_type
     end
 
     def toggle_like(model)

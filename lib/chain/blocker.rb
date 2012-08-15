@@ -5,8 +5,6 @@ module Chain
     included do |base|
       base.field    :blockees_count, type: Integer, default: 0
       base.has_many :blockees, class_name: 'Relationship', as: :blockee, dependent: :destroy
-      base.alias_attribute :blocked_id, :blocker_id
-      base.alias_attribute :blocked_type, :blocker_type
     end
 
     def block(model)
@@ -36,7 +34,7 @@ module Chain
     end
 
     def blocking?(model)
-      0 < self.blockees.where(blocker_id: model.id).count
+      0 < self.blockees.where(blocker_type: model.class.name, blocker_id: model.id).count
     end
   end
 end

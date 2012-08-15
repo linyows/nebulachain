@@ -5,8 +5,6 @@ module Chain
     included do |base|
       base.field    :followees_count, type: Integer, default: 0
       base.has_many :followees, class_name: 'Relationship', as: :followee, dependent: :destroy
-      base.alias_attribute :followed_id, :follower_id
-      base.alias_attribute :followed_type, :follower_type
     end
 
     def toggle_follow(model)
@@ -16,7 +14,7 @@ module Chain
         self.unfollow!(model)
       # follow
       else
-        if defined?(::Chain::Blockee) && object.is_a?(::Chain::Blockee)
+        if defined?(::Chain::Blockee) && self.is_a?(::Chain::Blockee)
           return false if self.blocked_by?(model)
         end
         self.follow!(model)
@@ -25,7 +23,7 @@ module Chain
 
     def follow(model)
       if self.id != model.id && !self.following?(model)
-        if defined?(::Chain::Blockee) && object.is_a?(::Chain::Blockee)
+        if defined?(::Chain::Blockee) && self.is_a?(::Chain::Blockee)
           return false if self.blocked_by?(model)
         end
         self.follow!(model)
@@ -61,7 +59,7 @@ module Chain
     end
 
     def following?(model)
-      0 < self.followees.where(followee_id: model.id).count
+      0 < self.followees.where(followee_type: model.class.name, followee_id: model.id).count
     end
   end
 end

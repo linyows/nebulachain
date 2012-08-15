@@ -5,8 +5,6 @@ module Chain
     included do |base|
       base.field    :gave_dislikes_count, type: Integer, default: 0
       base.has_many :gave_dislikes, class_name: 'Relationship', as: :gave_dislike, dependent: :destroy
-      base.alias_attribute :disliking_id, :gave_dislike_id
-      base.alias_attribute :disliking_type, :gave_dislike_type
     end
 
     def disliked_by?(model)

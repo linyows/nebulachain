@@ -5,8 +5,6 @@ module Chain
     included do |base|
       base.field    :got_dislikes_count, type: Integer, default: 0
       base.has_many :got_dislikes, class_name: 'Relationship', as: :got_dislike, dependent: :destroy
-      base.alias_attribute :disliking_id, :gave_dislike_id
-      base.alias_attribute :disliking_type, :gave_dislike_type
     end
 
     def toggle_dislike(model)
