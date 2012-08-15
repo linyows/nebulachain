@@ -29,7 +29,7 @@ module Chain
 
     def dislike!(model)
       self.before_dislike(model) if self.respond_to?('before_dislike')
-      self.got_dislikes.create!(got_dislike_type: model.class.name, got_dislike_id: model.id)
+      self.got_dislikes.create!(gave_dislike_type: model.class.name, gave_dislike_id: model.id)
       self.inc(:gave_dislikes_count, 1)
       model.inc(:got_dislikes_count, 1)
       self.after_dislike(model) if self.respond_to?('after_dislike')
@@ -45,7 +45,7 @@ module Chain
 
     def undislike!(model)
       self.before_undislike(model) if self.respond_to?('before_undislike')
-      self.got_dislikes.where(got_dislike_type: model.class.name, got_dislike_id: model.id).destroy
+      self.got_dislikes.where(gave_dislike_type: model.class.name, gave_dislike_id: model.id).destroy
       self.inc(:gave_dislikes_count, -1)
       model.inc(:got_dislikes_count, -1)
       self.after_undislike(model) if self.respond_to?('after_undislike')

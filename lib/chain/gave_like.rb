@@ -29,7 +29,7 @@ module Chain
 
     def like!(model)
       self.before_like(model) if self.respond_to?('before_like')
-      self.got_likes.create!(got_like_type: model.class.name, got_like_id: model.id)
+      self.got_likes.create!(gave_like_type: model.class.name, gave_like_id: model.id)
       self.inc(:gave_likes_count, 1)
       model.inc(:got_likes_count, 1)
       self.after_like(model) if self.respond_to?('after_like')
@@ -41,7 +41,7 @@ module Chain
 
     def unlike!(model)
       self.before_unlike(model) if self.respond_to?('before_unlike')
-      self.got_likes.where(got_like_type: model.class.name, got_like_id: model.id).destroy
+      self.got_likes.where(gave_like_type: model.class.name, gave_like_id: model.id).destroy
       self.inc(:gave_likes_count, -1)
       model.inc(:got_likes_count, -1)
       self.after_unlike(model) if self.respond_to?('after_unlike')
