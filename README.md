@@ -1,6 +1,6 @@
 # Chain
 
-TODO: Write a gem description
+Add follow/block like/dislike feature to Mongoid.
 
 ## Installation
 

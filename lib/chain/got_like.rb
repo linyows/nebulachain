@@ -3,30 +3,14 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :got_likes_count, type: Integer, default: 0
-      base.has_many :got_likes, class_name: 'Relationship', as: :got_like, dependent: :destroy
+      base.field    :gave_likes_count, type: Integer, default: 0
+      base.has_many :gave_likes, class_name: 'Relationship', as: :gave_like, dependent: :destroy
+      base.alias_attribute :liking_id, :got_like_id
+      base.alias_attribute :liking_type, :got_like_type
     end
 
     def liked_by?(model)
-      0 < self.got_likes.where(target_id: model.id).count
+      0 < self.gave_likes.where(got_like_type: model.class.name, got_like_id: model.id).count
     end
-
-    def all_got_likes
-      get_got_likes_of(self)
-    end
-
-    def common_got_likes_with(model)
-      model_got_likes = get_got_likes_of(model)
-      self_got_likes = get_got_likes_of(self)
-      self_got_likes & model_got_likes
-    end
-
-    private
-
-      def get_got_likes_of(model)
-        model.got_likes.collect do |f|
-          f.target_type.constantize.find(f.target_id)
-        end
-      end
   end
 end

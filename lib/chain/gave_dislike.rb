@@ -3,8 +3,10 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :gave_dislikes_count, type: Integer, default: 0
-      base.has_many :gave_dislikes, class_name: 'Relationship', as: :gave_dislike, dependent: :destroy
+      base.field    :got_dislikes_count, type: Integer, default: 0
+      base.has_many :got_dislikes, class_name: 'Relationship', as: :got_dislike, dependent: :destroy
+      base.alias_attribute :disliking_id, :gave_dislike_id
+      base.alias_attribute :disliking_type, :gave_dislike_type
     end
 
     def toggle_dislike(model)
@@ -28,13 +30,10 @@ module Chain
     end
 
     def dislike!(model)
-      model.before_disliked_by(self) if model.respond_to?('before_disliked_by')
-      model.got_dislikes.create!(target_type: self.class.name, target_id: self.id)
-      model.inc(:got_dislikes_count, 1)
-      model.after_disliked_by(self) if model.respond_to?('after_disliked_by')
       self.before_dislike(model) if self.respond_to?('before_dislike')
-      self.gave_dislikes.create!(target_type: model.class.name, target_id: model.id)
+      self.got_dislikes.create!(got_dislike_type: model.class.name, got_dislike_id: model.id)
       self.inc(:gave_dislikes_count, 1)
+      model.inc(:got_dislikes_count, 1)
       self.after_dislike(model) if self.respond_to?('after_dislike')
     end
 
@@ -47,36 +46,15 @@ module Chain
     end
 
     def undislike!(model)
-      model.before_undisliked_by(self) if model.respond_to?('before_undisliked_by')
-      model.got_dislikes.where(target_type: self.class.name, target_id: self.id).destroy
-      model.inc(:got_dislikes_count, -1)
-      model.after_undisliked_by(self) if model.respond_to?('after_undisliked_by')
       self.before_undislike(model) if self.respond_to?('before_undislike')
-      self.gave_dislikes.where(target_type: model.class.name, target_id: model.id).destroy
+      self.got_dislikes.where(got_dislike_type: model.class.name, got_dislike_id: model.id).destroy
       self.inc(:gave_dislikes_count, -1)
+      model.inc(:got_dislikes_count, -1)
       self.after_undislike(model) if self.respond_to?('after_undislike')
     end
 
     def dislike?(model)
-      0 < self.gave_dislikes.where(target_id: model.id).count
+      0 < self.got_dislikes.where(gave_dislike_type: model.class.name, gave_dislike_id: model.id).count
     end
-
-    def all_gave_dislikes
-      get_gave_dislikes_of(self)
-    end
-
-    def common_gave_dislikes_with(model)
-      model_gave_dislikes = get_gave_dislikes_of(model)
-      self_gave_dislikes = get_gave_dislikes_of(self)
-      self_gave_dislikes & model_gave_dislikes
-    end
-
-    private
-
-      def get_gave_dislikes_of(model)
-        model.gave_dislikes.collect do |f|
-          f.target_type.constantize.find(f.target_id)
-        end
-      end
   end
 end

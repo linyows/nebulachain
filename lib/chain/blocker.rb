@@ -3,34 +3,40 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :blockers_count, type: Integer, default: 0
-      base.has_many :blockers, class_name: 'Relationship', as: :blocker, dependent: :destroy
+      base.field    :blockees_count, type: Integer, default: 0
+      base.has_many :blockees, class_name: 'Relationship', as: :blockee, dependent: :destroy
+      base.alias_attribute :blocked_id, :blocker_id
+      base.alias_attribute :blocked_type, :blocker_type
     end
 
-    def blocked_by?(model)
-      0 < self.blockers.where(target_id: model.id).count
-    end
-
-    def blockers_count
-      self.blockers_count
-    end
-
-    def all_blockers
-      get_blockers_of(self)
-    end
-
-    def common_blockers_with(model)
-      model_blockers = get_blockers_of(model)
-      self_blockers = get_blockers_of(self)
-      self_blockers & model_blockers
-    end
-
-    private
-
-      def get_blockers_of(model)
-        model.blockers.collect do |f|
-          f.target_type.constantize.find(f.target_id)
-        end
+    def block(model)
+      if self.id != model.id && !self.blocking?(model)
+        self.before_block(model) if self.respond_to?('before_block')
+        self.blockees.create!(blocker_type: model.class.name, blocker_id: model.id)
+        self.inc(:blockees_count, 1)
+        model.inc(:blockers_count, 1)
+        self.after_block(model) if self.respond_to?('after_block')
+        true
+      else
+        false
       end
+    end
+
+    def unblock(model)
+      if self.id != model.id && self.blocking?(model)
+        self.before_unblock(model) if self.respond_to?('before_unblock')
+        self.blockees.where(blocker_type: model.class.name, blocker_id: model.id).destroy
+        self.inc(:blockees_count, -1)
+        model.inc(:blockers_count, -1)
+        self.after_unblock(model) if self.respond_to?('after_unblock')
+        true
+      else
+        false
+      end
+    end
+
+    def blocking?(model)
+      0 < self.blockees.where(blocker_id: model.id).count
+    end
   end
 end

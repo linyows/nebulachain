@@ -3,45 +3,65 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :followers_count, type: Integer, default: 0
-      base.has_many :followers, class_name: 'Relationship', as: :follower, dependent: :destroy
+      base.field    :followees_count, type: Integer, default: 0
+      base.has_many :followees, class_name: 'Relationship', as: :followee, dependent: :destroy
+      base.alias_attribute :followed_id, :follower_id
+      base.alias_attribute :followed_type, :follower_type
     end
 
-    def followed_by?(model)
-      0 < self.followers.where(target_id: model.id).count
-    end
-
-    def all_followers
-      get_followers_of(self)
-    end
-
-    def all_followers_by_model(model)
-      get_followers_of(self, model)
-    end
-
-    def common_followers_with(model)
-      model_followers = get_followers_of(model)
-      self_followers = get_followers_of(self)
-      self_followers & model_followers
-    end
-
-    private
-
-    def get_followers_of(me, model = nil)
-      followers = !model ? me.followers : me.followers.where(target_type: model.to_s)
-      followers.collect do |f|
-        f.target_type.constantize.find(f.target_id)
-      end
-    end
-
-    def method_missing(missing_method, *args, &block)
-      if missing_method.to_s =~ /^(.+)_followers_count$/
-        followers_count_by_model($1.camelize)
-      elsif missing_method.to_s =~ /^all_(.+)_followers$/
-        all_followers_by_model($1.camelize)
+    def toggle_follow(model)
+      return false if self.id == model.id
+      # unfollow
+      if self.following?(model)
+        self.unfollow!(model)
+      # follow
       else
-        super
+        if defined?(::Chain::Blockee) && object.is_a?(::Chain::Blockee)
+          return false if self.blocked_by?(model)
+        end
+        self.follow!(model)
       end
+    end
+
+    def follow(model)
+      if self.id != model.id && !self.following?(model)
+        if defined?(::Chain::Blockee) && object.is_a?(::Chain::Blockee)
+          return false if self.blocked_by?(model)
+        end
+        self.follow!(model)
+      else
+        false
+      end
+    end
+
+    def follow!(model)
+      self.before_follow(model) if self.respond_to?('before_follow')
+      self.followees.create!(follower_type: model.class.name, follower_id: model.id)
+      self.inc(:followees_count, 1)
+      model.inc(:followers_count, 1)
+      self.after_follow(model) if self.respond_to?('after_follow')
+      true
+    end
+
+    def unfollow(model)
+      if self.id != model.id && self.following?(model)
+        self.unfollow!(model)
+      else
+        false
+      end
+    end
+
+    def unfollow!(model)
+      self.before_unfollow(model) if self.respond_to?('before_unfollow')
+      self.followees.where(follower_type: model.class.name, follower_id: model.id).destroy
+      self.inc(:followees_count, -1)
+      model.inc(:followers_count, -1)
+      self.after_unfollow(model) if self.respond_to?('after_unfollow')
+      true
+    end
+
+    def following?(model)
+      0 < self.followees.where(followee_id: model.id).count
     end
   end
 end
