@@ -50,5 +50,31 @@ module Chain
     def like?(model)
       0 < self.got_likes.where(gave_like_type: model.class.name, gave_like_id: model.id).count
     end
+
+    # likes
+    def likes(model_name = nil, methods = {})
+      methods = model_name and model_name = nil if model_name.is_a?(Hash)
+      criteria = methods.present? ?
+        self.got_likes.eval(methods.to_s_of_method_chaining) : self.got_likes
+
+      if model_name.nil?
+        criteria.collect do |doc|
+          doc.gave_like_type.constantize.find(doc.gave_like_id)
+        end
+      else
+        ids = criteria.where(gave_like_type: model_name).map { |d| d.gave_like_id }
+        model_name.constantize.any_in(_id: ids)
+      end
+    end
+
+    private
+
+    def method_missing(missing_method, *args, &block)
+      if missing_method.to_s =~ /^likes_(.+)$/
+        likes($1.singularize.titleize, args[0])
+      else
+        super
+      end
+    end
   end
 end

@@ -36,5 +36,31 @@ module Chain
     def blocking?(model)
       0 < self.blockees.where(blocker_type: model.class.name, blocker_id: model.id).count
     end
+
+    # blockees
+    def blocking(model_name = nil, methods = {})
+      methods = model_name and model_name = nil if model_name.is_a?(Hash)
+      criteria = methods.present? ?
+        self.blockees.eval(methods.to_s_of_method_chaining) : self.blockees
+
+      if model_name.nil?
+        criteria.collect do |doc|
+          doc.blocker_type.constantize.find(doc.blocker_id)
+        end
+      else
+        ids = criteria.where(blocker_type: model_name).map { |d| d.blocker_id }
+        model_name.constantize.any_in(_id: ids)
+      end
+    end
+
+    private
+
+    def method_missing(missing_method, *args, &block)
+      if missing_method.to_s =~ /^blocking_(.+)$/
+        blocking($1.singularize.titleize, args[0])
+      else
+        super
+      end
+    end
   end
 end

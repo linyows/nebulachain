@@ -61,5 +61,31 @@ module Chain
     def following?(model)
       0 < self.followees.where(followee_type: model.class.name, followee_id: model.id).count
     end
+
+    # followees
+    def following(model_name = nil, methods = {})
+      methods = model_name and model_name = nil if model_name.is_a?(Hash)
+      criteria = methods.present? ?
+        self.followees.eval(methods.to_s_of_method_chaining) : self.followees
+
+      if model_name.nil?
+        criteria.collect do |doc|
+          doc.follower_type.constantize.find(doc.follower_id)
+        end
+      else
+        ids = criteria.where(follower_type: model_name).map { |d| d.follower_id }
+        model_name.constantize.any_in(_id: ids)
+      end
+    end
+
+    private
+
+    def method_missing(missing_method, *args, &block)
+      if missing_method.to_s =~ /^following_(.+)$/
+        following($1.singularize.titleize, args[0])
+      else
+        super
+      end
+    end
   end
 end
