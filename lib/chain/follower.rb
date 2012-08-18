@@ -3,7 +3,7 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :followees_count, type: Integer, default: 0
+      base.field    :followers_count, type: Integer, default: 0
       base.has_many :followees, class_name: 'Relationship', as: :followee, dependent: :destroy
     end
 

@@ -3,7 +3,7 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :got_dislikes_count, type: Integer, default: 0
+      base.field    :gave_dislikes_count, type: Integer, default: 0
       base.has_many :got_dislikes, class_name: 'Relationship', as: :got_dislike, dependent: :destroy
     end
 

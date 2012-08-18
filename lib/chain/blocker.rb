@@ -3,7 +3,7 @@ module Chain
     extend ActiveSupport::Concern
 
     included do |base|
-      base.field    :blockees_count, type: Integer, default: 0
+      base.field    :blockers_count, type: Integer, default: 0
       base.has_many :blockees, class_name: 'Relationship', as: :blockee, dependent: :destroy
     end
 
