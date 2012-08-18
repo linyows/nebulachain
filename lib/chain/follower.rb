@@ -59,7 +59,7 @@ module Chain
     end
 
     def following?(model)
-      0 < self.followees.where(followee_type: model.class.name, followee_id: model.id).count
+      0 < self.followees.where(follower_type: model.class.name, follower_id: model.id).count
     end
 
     # followees
