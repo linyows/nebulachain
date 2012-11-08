@@ -1,4 +1,4 @@
-module Chain
+module Nebulachain
   module Follower
     extend ActiveSupport::Concern
 
@@ -14,7 +14,7 @@ module Chain
         self.unfollow!(model)
       # follow
       else
-        if defined?(::Chain::Blockee) && self.is_a?(::Chain::Blockee)
+        if defined?(::Nebulachain::Blockee) && self.is_a?(::Nebulachain::Blockee)
           return false if self.blocked_by?(model)
         end
         self.follow!(model)
@@ -23,7 +23,7 @@ module Chain
 
     def follow(model)
       if self.id != model.id && !self.following?(model)
-        if defined?(::Chain::Blockee) && self.is_a?(::Chain::Blockee)
+        if defined?(::Nebulachain::Blockee) && self.is_a?(::Nebulachain::Blockee)
           return false if self.blocked_by?(model)
         end
         self.follow!(model)

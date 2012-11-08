@@ -1,4 +1,4 @@
-module Chain
+module Nebulachain
   module GotLike
     extend ActiveSupport::Concern
 

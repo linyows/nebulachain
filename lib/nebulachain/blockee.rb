@@ -1,4 +1,4 @@
-module Chain
+module Nebulachain
   module Blockee
     extend ActiveSupport::Concern
 

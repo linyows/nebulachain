@@ -1,4 +1,4 @@
-module Chain
+module Nebulachain
   module GaveLike
     extend ActiveSupport::Concern
 

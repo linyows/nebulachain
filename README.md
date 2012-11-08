@@ -1,4 +1,4 @@
-# Chain
+# Nebulachain
 
 Add follow/block like/dislike feature to Mongoid.
 
@@ -6,7 +6,7 @@ Add follow/block like/dislike feature to Mongoid.
 
 Add this line to your application's Gemfile:
 
-    gem 'chain'
+    gem 'nebulachain'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install chain
+    $ gem install nebulachain
 
 ## Usage
 
