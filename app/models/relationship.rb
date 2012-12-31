@@ -10,6 +10,7 @@ class Relationship
   belongs_to :gave_like,    polymorphic: true
   belongs_to :got_dislike,  polymorphic: true
   belongs_to :gave_dislike, polymorphic: true
+  has_many :models, as: :equalable, dependent: :nullify
 
   def self.leader
     map = %Q{
